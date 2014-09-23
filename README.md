@@ -11,7 +11,7 @@ vessel.onMessage(function(channel, message) {
     console.log(channel + ': ' + message);
 });
 
-vessel.addChannelCallback('notifications', function(message) {
+vessel.subscribe('notifications', function(message) {
     // Fire whenever a message is received on the 'notifications' channel.
     console.log(message);
 });
