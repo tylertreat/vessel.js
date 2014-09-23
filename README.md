@@ -20,8 +20,8 @@ vessel.addChannelCallback('notifications', function(message) {
 vessel.send('foo', 'hello world!');
 
 // Send another message on the 'foo' channel but listen for a response.
-vessel.send('foo', 'is this thing on?', function(channel, message) {
+vessel.send('foo', 'is this thing on?', function(message) {
     // Fire when a response to this message is received.
-    console.log(channel + ': ' + message);
+    console.log(message);
 });
 ```
