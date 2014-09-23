@@ -21,7 +21,7 @@ require([
         }
     };
 
-    vessel.addChannelCallback("baz", function(message) {
+    vessel.subscribe("baz", function(message) {
         console.log(message);
     });
 });

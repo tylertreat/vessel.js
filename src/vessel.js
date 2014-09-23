@@ -91,7 +91,7 @@ define([
     // whenever a message is received on the channel. If a response on the
     // channel is associated with a sent message which has a callback, both
     // callbacks will be invoked.
-    Vessel.prototype.addChannelCallback = function(channel, callback) {
+    Vessel.prototype.subscribe = function(channel, callback) {
         this._chanCallbacks[channel] = callback;
     };
 
