@@ -1,6 +1,7 @@
 define([
     'sockjs',
-], function(SockJS) {
+    'json_marshaler',
+], function(SockJS, JSONMarshaler) {
     'use strict';
 
     // Create a new Vessel client for sending and receiving messages.
@@ -18,11 +19,14 @@ define([
         this._host = host;
         this._msgCallbacks = {};
         this._chanCallbacks = {};
+        this._marshaler = new JSONMarshaler();
         this._transport = new SockJS(host);
 
+        // On message, fire receive callback, message callback, then channel
+        // callback.
         this._transport.onmessage = function(e) {
             self._log('Recv: ' + e.data);
-            var payload = JSON.parse(e.data);
+            var payload = self._marshaler.unmarshal(e.data);
 
             if (self._recvCallback) {
                 self._recvCallback(payload.channel, payload.body);
@@ -63,7 +67,7 @@ define([
     // invoked the first time a message response is received.
     Vessel.prototype.send = function(channel, msg, callback) {
         var id = this._nextId();
-        var payload = JSON.stringify({
+        var payload = this._marshaler.marshal({
             id: id,
             channel: channel,
             body: msg,
@@ -94,6 +98,11 @@ define([
     // Remove a channel callback. Has no effect if the channel has no callback.
     Vessel.prototype.removeChannelCallback = function(channel) {
         delete this._chanCallbacks[channel];
+    };
+
+    // Set the marshaler used for serializing/deserializing messages.
+    Vessel.prototype.setMarshaler = function(marshaler) {
+        this._marshaler = marshaler;
     };
 
     return Vessel;
