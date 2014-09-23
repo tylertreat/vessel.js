@@ -1,7 +1,7 @@
 vessel.js
 =========
 
-Vessel messaging client.
+[Vessel](https://github.com/tylertreat/vessel) is a fast, asynchronous client-server messaging library. Send, receive, and subscribe to messages over channels.
 
 ```javascript
 var vessel = new Vessel('http://localhost:8081/vessel');
