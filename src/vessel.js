@@ -33,7 +33,7 @@ define([
             }
 
             if (payload.id in self._msgCallbacks) {
-                self._msgCallbacks[payload.id](payload.channel, payload.body);
+                self._msgCallbacks[payload.id](payload.body);
                 delete self._msgCallbacks[payload.id];
             }
 

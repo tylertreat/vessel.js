@@ -13,8 +13,8 @@ require([
     var send = document.getElementById("submit");
     send.onclick = function() {
         if (input.value == 'test') {
-            vessel.send('foo', input.value, function(channel, message) {
-                console.log(channel + ': ' + message);
+            vessel.send('foo', input.value, function(message) {
+                console.log(message);
             });
         } else {
             vessel.send('foo', input.value);
@@ -22,6 +22,6 @@ require([
     };
 
     vessel.addChannelCallback("baz", function(message) {
-        alert(message);
+        console.log(message);
     });
 });
