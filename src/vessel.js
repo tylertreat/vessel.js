@@ -1,7 +1,8 @@
 define([
     'sockjs',
     'json_marshaler',
-], function(SockJS, JSONMarshaler) {
+    'http_transport',
+], function(SockJS, JSONMarshaler, HTTPTransport) {
     'use strict';
 
     // Create a new Vessel client for sending and receiving messages.
@@ -14,13 +15,23 @@ define([
         var self = this;
 
         options = options || {};
+        this._options = options;
         this._debug = 'debug' in options ? options.debug : false;
 
         this._host = host;
         this._msgCallbacks = {};
         this._chanCallbacks = {};
         this._marshaler = new JSONMarshaler();
-        this._transport = new SockJS(host);
+
+        // Default to sockjs transport.
+        var transport = 'transport' in options ? options.transport : 'sockjs';
+        if (transport === 'sockjs') {
+            this._transport = new SockJS(host);
+        } else if (transport === 'http') {
+            this._transport = new HTTPTransport('http://localhost:8082');
+        } else {
+            throw "Invalid transport " + transport;
+        }
 
         // On message, fire receive callback, message callback, then channel
         // callback.
