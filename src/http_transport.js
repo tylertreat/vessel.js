@@ -82,7 +82,7 @@ define([
                     clearInterval(this._polls[id].intervalID);
                     delete this._polls[id];
                 } else {
-                    console._log(error);
+                    this._log(error);
                 }
             }.bind(this),
         });
