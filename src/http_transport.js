@@ -82,6 +82,8 @@ define([
                     clearInterval(this._polls[id].intervalID);
                     delete this._polls[id];
                 } else {
+                    // TODO: Make this more intelligent. If a poll sequentially fails n
+                    // times in a row, kill it.
                     this._log(error);
                 }
             }.bind(this),
