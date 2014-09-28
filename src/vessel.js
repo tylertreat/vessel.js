@@ -31,7 +31,7 @@ define([
         if (transport === 'sockjs') {
             this._transport = new SockJSTransport(host, options);
         } else if (transport === 'http') {
-            this._transport = new HTTPTransport('http://localhost:8082', options);
+            this._transport = new HTTPTransport(host, options);
         } else {
             throw "Invalid transport " + transport;
         }

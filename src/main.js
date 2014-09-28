@@ -15,7 +15,10 @@ require([
     'vessel',
 ], function(Vessel) {
     'use strict';
-    var vessel = new Vessel('http://localhost:8081/vessel', {debug: true, transport: 'http'});
+    var vessel = new Vessel('http://localhost:8081/vessel', {
+        debug: false,
+        transport: 'http',
+    });
     var input = document.getElementById("input");
     var send = document.getElementById("submit");
     send.onclick = function() {

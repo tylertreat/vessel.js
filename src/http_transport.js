@@ -32,7 +32,7 @@ define([
     // response.
     HTTPTransport.prototype.send = function(payload) {
         $.ajax({
-            url: this._host + '/_vessel',
+            url: this._host,
             type: 'POST',
             contentType: 'json',
             data: payload,
@@ -94,7 +94,7 @@ define([
     HTTPTransport.prototype.subscribe = function(channel) {
         var intervalID = setInterval(function() {
             $.ajax({
-                url: this._host + '/_vessel/channel/' + channel,
+                url: this._host + '/channel/' + channel,
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
