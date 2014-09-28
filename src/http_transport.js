@@ -17,6 +17,7 @@ define([
         this._host = host;
         this._polls = {};
         this._pollInterval = options.pollInterval || 3000;
+        this._subscriptions = {};
     }
 
     // Log the message if debug is enabled.
@@ -27,7 +28,7 @@ define([
     };
 
     // Send a message. If the message is successfully sent, begin polling for
-    // responses. If an onmessage callback is set, it will be fired for each
+    // responses. If an onMessage callback is set, it will be fired for each
     // response.
     HTTPTransport.prototype.send = function(payload) {
         $.ajax({
@@ -50,7 +51,7 @@ define([
 
     };
 
-    // Poll for message responses. Fire the onmessage callback for each
+    // Poll for message responses. Fire the onMessage callback for each
     // response. If responses are done, stop polling.
     HTTPTransport.prototype._poll = function(id, channel, url) {
         $.ajax({
@@ -65,10 +66,10 @@ define([
                     delete this._polls[id];
                 }
 
-                // Fire onmessage for each response.
-                if (this.onmessage) {
+                // Fire onMessage for each response.
+                if (this.onMessage) {
                     for (var i = responseCtx.received; i < response.responses.length; i++) {
-                        this.onmessage({data: JSON.stringify(response.responses[i])});
+                        this.onMessage(JSON.stringify(response.responses[i]));
                     }
                 }
 
@@ -88,6 +89,34 @@ define([
                 }
             }.bind(this),
         });
+    };
+
+    HTTPTransport.prototype.subscribe = function(channel) {
+        var intervalID = setInterval(function() {
+            $.ajax({
+                url: this._host + '/_vessel/channel/' + channel,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (this.onMessage) {
+                        for (var i = 0; i < response.length; i++) {
+                            this.onMessage(JSON.stringify(response[i]));
+                        }
+                    }
+                }.bind(this),
+                error: function(xhr, error) {
+                    this._log(error);
+                }.bind(this),
+            });
+        }.bind(this), this._pollInterval);
+        this._subscriptions[channel] = intervalID;
+    };
+
+    HTTPTransport.prototype.unsubscribe = function(channel) {
+        if (channel in this._subscriptions) {
+            clearInterval(this._subscriptions[channel]);
+            delete this._subscriptions[channel];
+        }
     };
 
     return HTTPTransport;

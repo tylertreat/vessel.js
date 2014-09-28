@@ -2,7 +2,8 @@ define([
     'sockjs',
     'json_marshaler',
     'http_transport',
-], function(SockJS, JSONMarshaler, HTTPTransport) {
+    'sockjs_transport',
+], function(SockJS, JSONMarshaler, HTTPTransport, SockJSTransport) {
     'use strict';
 
     // Create a new Vessel client for sending and receiving messages.
@@ -21,23 +22,25 @@ define([
         this._host = host;
         this._msgCallbacks = {};
         this._chanCallbacks = {};
-        this._marshaler = new JSONMarshaler();
+        this._marshaler = 'marshaler' in options ?
+            options.marshaler :
+            new JSONMarshaler();
 
         // Default to sockjs transport.
         var transport = 'transport' in options ? options.transport : 'sockjs';
         if (transport === 'sockjs') {
-            this._transport = new SockJS(host);
+            this._transport = new SockJSTransport(host, options);
         } else if (transport === 'http') {
-            this._transport = new HTTPTransport('http://localhost:8082');
+            this._transport = new HTTPTransport('http://localhost:8082', options);
         } else {
             throw "Invalid transport " + transport;
         }
 
         // On message, fire receive callback, message callback, then channel
         // callback.
-        this._transport.onmessage = function(e) {
-            self._log('Recv: ' + e.data);
-            var payload = self._marshaler.unmarshal(e.data);
+        this._transport.onMessage = function(msg) {
+            self._log('Recv: ' + msg);
+            var payload = self._marshaler.unmarshal(msg);
 
             if (self._recvCallback) {
                 self._recvCallback(payload.channel, payload.body);
@@ -95,7 +98,7 @@ define([
     // Set a callback to be invoked on every received message. This will be
     // invoked in addition to any channel and message callbacks.
     Vessel.prototype.onMessage = function(callback) {
-        this._recvCallback = callback;
+        this._transport.onMessage(callback);
     };
 
     // Add a callback to the given channel. This callback will be invoked
@@ -104,11 +107,13 @@ define([
     // callbacks will be invoked.
     Vessel.prototype.subscribe = function(channel, callback) {
         this._chanCallbacks[channel] = callback;
+        this._transport.subscribe(channel);
     };
 
     // Remove a channel callback. Has no effect if the channel has no callback.
-    Vessel.prototype.removeChannelCallback = function(channel) {
+    Vessel.prototype.unsubscribe = function(channel) {
         delete this._chanCallbacks[channel];
+        this._transport.unsubscribe(channel);
     };
 
     // Set the marshaler used for serializing/deserializing messages.
