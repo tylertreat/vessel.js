@@ -67,13 +67,13 @@ define([
 
                 // Fire onmessage for each response.
                 if (this.onmessage) {
-                    for (var i = responseCtx.received; i < response.results.length; i++) {
-                        this.onmessage({data: JSON.stringify(response.results[i])});
+                    for (var i = responseCtx.received; i < response.responses.length; i++) {
+                        this.onmessage({data: JSON.stringify(response.responses[i])});
                     }
                 }
 
                 // Update our place in the responses.
-                responseCtx.received = response.results.length;
+                responseCtx.received = response.responses.length;
             }.bind(this),
             error: function(xhr, error) {
                 if (xhr.status === 404) {
