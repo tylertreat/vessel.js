@@ -75,6 +75,14 @@ define([
         return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
     };
 
+    Vessel.prototype._now = function() {
+        if (!Date.now) {
+            Date.now = function() { return new Date().getTime(); };
+        }
+
+        return Math.round(Date.now() / 1000);
+    };
+
     // Send a message on the given channel. If a callback is provided, it will
     // be invoked when a response is received. If the channel has a callback
     // registered, both callbacks will be invoked. Message callbacks are only
@@ -85,6 +93,7 @@ define([
             id: id,
             channel: channel,
             body: msg,
+            timestamp: this._now(),
         });
 
         if (callback) {
