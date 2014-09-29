@@ -91,16 +91,23 @@ define([
         });
     };
 
+    // Poll for channel messages. Track the timestamp for the last message seen
+    // on the channel and only ask for messages since then.
     HTTPTransport.prototype.subscribe = function(channel) {
         var intervalID = setInterval(function() {
+            var lastSeen = this._subscriptions[channel].lastSeen;
             $.ajax({
-                url: this._host + '/channel/' + channel,
+                url: this._host + '/channel/' + channel + '?since=' + lastSeen,
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
                     if (this.onMessage) {
                         for (var i = 0; i < response.length; i++) {
                             this.onMessage(JSON.stringify(response[i]));
+                            if (i === response.length - 1) {
+                                // Update the last seen timestamp.
+                                this._subscriptions[channel].lastSeen = response[i].timestamp;
+                            }
                         }
                     }
                 }.bind(this),
@@ -109,7 +116,7 @@ define([
                 }.bind(this),
             });
         }.bind(this), this._pollInterval);
-        this._subscriptions[channel] = intervalID;
+        this._subscriptions[channel] = {intervalID: intervalID, lastSeen: 0};
     };
 
     HTTPTransport.prototype.unsubscribe = function(channel) {

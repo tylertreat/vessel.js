@@ -15,9 +15,9 @@ require([
     'vessel',
 ], function(Vessel) {
     'use strict';
-    var vessel = new Vessel('http://localhost:8081/vessel', {
+    var vessel = new Vessel('http://localhost:8082/vessel', {
         debug: true,
-        transport: 'sockjs',
+        transport: 'http',
     });
     var input = document.getElementById("input");
     var send = document.getElementById("submit");
