@@ -107,7 +107,7 @@ define([
     // Set a callback to be invoked on every received message. This will be
     // invoked in addition to any channel and message callbacks.
     Vessel.prototype.onMessage = function(callback) {
-        this._transport.onMessage(callback);
+        this._recvCallback = callback;
     };
 
     // Add a callback to the given channel. This callback will be invoked
